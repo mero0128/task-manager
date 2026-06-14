@@ -24,19 +24,27 @@ const addTask = (title) => {
   console.log(`Task added: "${title}"`);
 };
 
-// List all tasks
-const listTasks = () => {
+// List all tasks with optional filter
+const listTasks = (filter) => {
   const tasks = loadTasks();
   if (tasks.length === 0) {
     console.log('No tasks yet!');
     return;
   }
-  tasks.forEach(task => {
+
+  let filteredTasks = tasks;
+
+  if (filter === '--done') {
+    filteredTasks = tasks.filter(t => t.done === true);
+  } else if (filter === '--pending') {
+    filteredTasks = tasks.filter(t => t.done === false);
+  }
+
+  filteredTasks.forEach(task => {
     const status = task.done ? '✅' : '❌';
     console.log(`${status} [${task.id}] ${task.title}`);
   });
 };
-
 // Mark task as done
 const completeTask = (id) => {
   const tasks = loadTasks();
@@ -67,7 +75,7 @@ const argument = process.argv[3];
 if (command === 'add') {
   addTask(argument);
 } else if (command === 'list') {
-  listTasks();
+  listTasks(argument);
 } else if (command === 'done') {
   completeTask(argument);
 } else if (command === 'delete') {
