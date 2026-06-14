@@ -1,0 +1,77 @@
+const fs = require('fs');
+
+// Load tasks from file
+const loadTasks = () => {
+  const data = fs.readFileSync('tasks.json', 'utf-8');
+  return JSON.parse(data);
+};
+
+// Save tasks to file
+const saveTasks = (tasks) => {
+  fs.writeFileSync('tasks.json', JSON.stringify(tasks, null, 2));
+};
+
+// Add a task
+const addTask = (title) => {
+  const tasks = loadTasks();
+  const newTask = {
+    id: tasks.length + 1,
+    title: title,
+    done: false
+  };
+  tasks.push(newTask);
+  saveTasks(tasks);
+  console.log(`Task added: "${title}"`);
+};
+
+// List all tasks
+const listTasks = () => {
+  const tasks = loadTasks();
+  if (tasks.length === 0) {
+    console.log('No tasks yet!');
+    return;
+  }
+  tasks.forEach(task => {
+    const status = task.done ? '✅' : '❌';
+    console.log(`${status} [${task.id}] ${task.title}`);
+  });
+};
+
+// Mark task as done
+const completeTask = (id) => {
+  const tasks = loadTasks();
+  const task = tasks.find(t => t.id === parseInt(id));
+  if (task) {
+    task.done = true;
+    saveTasks(tasks);
+    console.log(`Task ${id} marked as done!`);
+  } else {
+    console.log(`Task ${id} not found`);
+  }
+};
+// Delete a task
+const deleteTask = (id) => {
+  const tasks = loadTasks();
+  const filtered = tasks.filter(t => t.id !== parseInt(id));
+  if (filtered.length === tasks.length) {
+    console.log(`Task ${id} not found`);
+    return;
+  }
+  saveTasks(filtered);
+  console.log(`Task ${id} deleted!`);
+};
+// Read command from terminal
+const command = process.argv[2];
+const argument = process.argv[3];
+
+if (command === 'add') {
+  addTask(argument);
+} else if (command === 'list') {
+  listTasks();
+} else if (command === 'done') {
+  completeTask(argument);
+} else if (command === 'delete') {
+  deleteTask(argument);
+} else {
+  console.log('Commands: add "task" | list | done <id>');
+}
