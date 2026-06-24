@@ -42,6 +42,20 @@ app.put('/tasks/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update task' });
   }
 });
+// PATCH update specific fields
+app.patch('/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { done, title } = req.body;
+    const task = await prisma.task.update({
+      where: { id: parseInt(id) },
+      data: { done, title }
+    });
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+});
 
 // DELETE a task
 app.delete('/tasks/:id', async (req, res) => {
