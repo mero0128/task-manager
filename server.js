@@ -1,7 +1,9 @@
+const cors = require('cors');
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 
 const app = express();
+app.use(cors());
 const prisma = new PrismaClient();
 
 app.use(express.json());
@@ -67,6 +69,21 @@ app.delete('/tasks/:id', async (req, res) => {
     res.json({ message: 'Task deleted!' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete task' });
+  }
+});
+// GET single task by ID
+app.get('/tasks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await prisma.task.findUnique({
+      where: { id: parseInt(id) }
+    });
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch task' });
   }
 });
 
